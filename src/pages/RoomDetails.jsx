@@ -128,15 +128,13 @@ export default function RoomDetails() {
                             </div>
                         </div>
 
-                        {isAdmin && (
-                            <button
-                                onClick={() => setIsBookingModalOpen(true)}
-                                className="premium-button flex items-center justify-center gap-3 px-10 py-5 rounded-[2rem] font-black text-sm uppercase tracking-[0.2em] shadow-2xl"
-                            >
-                                <Plus size={22} />
-                                Забронювати
-                            </button>
-                        )}
+                        <button
+                            onClick={() => setIsBookingModalOpen(true)}
+                            className="premium-button flex items-center justify-center gap-3 px-10 py-5 rounded-[2rem] font-black text-sm uppercase tracking-[0.2em] shadow-2xl"
+                        >
+                            <Plus size={22} />
+                            Забронювати
+                        </button>
                     </div>
                 </div>
 
@@ -188,7 +186,7 @@ export default function RoomDetails() {
                                             <span className="text-xs font-bold text-slate-300 bg-white/5 px-3 py-1 rounded-full border border-white/5">{booking.createdBy}</span>
                                         </div>
 
-                                        {(isAdmin || booking.createdBy === normalizedUserEmail) && (
+                                        {isAdmin && (
                                             <div className="flex gap-2">
                                                 <button
                                                     onClick={() => {
