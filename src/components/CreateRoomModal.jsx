@@ -33,50 +33,54 @@ export default function CreateRoomModal({ onClose }) {
     }
 
     return (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl animate-in fade-in zoom-in duration-200">
-                <div className="flex justify-between items-center p-6 border-b border-slate-100">
-                    <h2 className="text-xl font-bold text-slate-900">Нова кімната</h2>
-                    <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors">
-                        <X size={24} />
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-4 z-50">
+            <div className="glass-card rounded-[2.5rem] w-full max-w-md shadow-2xl animate-in fade-in zoom-in duration-300 relative overflow-hidden">
+                <div className="absolute -top-24 -right-24 w-48 h-48 bg-indigo-600/20 blur-3xl rounded-full"></div>
+
+                <div className="flex justify-between items-center p-8 border-b border-white/5 relative z-10">
+                    <h2 className="text-2xl font-black text-white tracking-tight uppercase italic">Нова кімната</h2>
+                    <button onClick={onClose} className="text-slate-500 hover:text-white transition-colors bg-white/5 p-2 rounded-xl border border-white/5">
+                        <X size={20} />
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Назва кімнати</label>
-                        <input
-                            required
-                            type="text"
-                            placeholder="Наприклад: Meeting Room 1"
-                            className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Опис</label>
-                        <textarea
-                            placeholder="Наприклад: Кімната для брейншторму"
-                            rows="3"
-                            className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all resize-none"
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                        />
+                <form onSubmit={handleSubmit} className="p-8 space-y-6 relative z-10">
+                    <div className="space-y-5">
+                        <div>
+                            <label className="block text-sm font-bold text-white/60 mb-2 ml-1 uppercase tracking-widest">Назва кімнати</label>
+                            <input
+                                required
+                                type="text"
+                                placeholder="Наприклад: Executive Suite"
+                                className="glass-input w-full px-5 py-4 rounded-2xl text-white placeholder-slate-600 transition-all font-medium"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-bold text-white/60 mb-2 ml-1 uppercase tracking-widest">Опис</label>
+                            <textarea
+                                placeholder="Наприклад: Простір для стратегічних рішень..."
+                                rows="3"
+                                className="glass-input w-full px-5 py-4 rounded-2xl text-white placeholder-slate-600 transition-all font-medium resize-none"
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                            />
+                        </div>
                     </div>
 
-                    <div className="pt-4 flex gap-3">
+                    <div className="pt-4 flex gap-4">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 py-2.5 px-4 border border-slate-200 rounded-xl font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+                            className="flex-1 py-4 px-4 glass-input rounded-2xl text-slate-300 font-bold hover:bg-white/5 transition-all text-sm uppercase tracking-widest border-none"
                         >
                             Скасувати
                         </button>
                         <button
                             disabled={loading}
                             type="submit"
-                            className="flex-1 py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition-all disabled:opacity-50"
+                            className="premium-button flex-1 py-4 px-4 rounded-2xl font-black text-white transition-all text-sm uppercase tracking-widest disabled:opacity-50"
                         >
                             {loading ? 'Створення...' : 'Створити'}
                         </button>

@@ -64,6 +64,12 @@ export default function BookingModal({ room, onClose, booking = null }) {
                 return;
             }
 
+            if (start < new Date()) {
+                setError('Не можна бронювати час у минулому');
+                setLoading(false);
+                return;
+            }
+
             const startTS = Timestamp.fromDate(start);
             const endTS = Timestamp.fromDate(end);
 
@@ -103,46 +109,49 @@ export default function BookingModal({ room, onClose, booking = null }) {
     };
 
     return (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl animate-in fade-in zoom-in duration-200 overflow-hidden">
-                <div className="flex justify-between items-center p-6 border-b border-slate-100">
-                    <h2 className="text-xl font-bold text-slate-900">
-                        {booking ? 'Редагувати бронювання' : 'Нове бронювання'}
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-4 z-50">
+            <div className="glass-card rounded-[2.5rem] w-full max-w-md shadow-2xl animate-in fade-in zoom-in duration-300 relative overflow-hidden">
+                <div className="absolute -top-24 -right-24 w-48 h-48 bg-indigo-600/20 blur-3xl rounded-full"></div>
+
+                <div className="flex justify-between items-center p-8 border-b border-white/5 relative z-10">
+                    <h2 className="text-2xl font-black text-white tracking-tight uppercase italic">
+                        {booking ? 'Редагувати' : 'Нова зустріч'}
                     </h2>
-                    <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors">
-                        <X size={24} />
+                    <button onClick={onClose} className="text-slate-500 hover:text-white transition-colors bg-white/5 p-2 rounded-xl border border-white/5">
+                        <X size={20} />
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-6 space-y-5">
+                <form onSubmit={handleSubmit} className="p-8 space-y-6 relative z-10">
                     {error && (
-                        <div className="bg-red-50 text-red-600 p-4 rounded-2xl flex items-center gap-3 text-sm font-medium animate-shake">
-                            <AlertCircle size={20} />
+                        <div className="bg-red-500/10 text-red-400 p-4 rounded-2xl flex items-center gap-3 text-xs font-bold uppercase tracking-widest border border-red-500/20 animate-shake">
+                            <AlertCircle size={18} />
                             {error}
                         </div>
                     )}
 
                     <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-1.5">Тема зустрічі</label>
+                        <label className="block text-[10px] font-black text-white mb-2 ml-1 uppercase tracking-[0.2em]">Тема зустрічі</label>
                         <input
                             required
                             type="text"
-                            placeholder="Наприклад: Daily Standup"
-                            className="w-full px-4 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+                            placeholder="Наприклад: Executive Sync"
+                            className="glass-input w-full px-5 py-4 rounded-2xl text-white placeholder-slate-600 transition-all font-medium"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-1.5 flex items-center gap-2">
-                            <Calendar size={16} className="text-indigo-500" />
+                        <label className="block text-[10px] font-black text-white mb-2 ml-1 uppercase tracking-[0.2em] flex items-center gap-2">
+                            <Calendar size={14} className="text-white" />
                             Дата
                         </label>
                         <input
                             required
                             type="date"
-                            className="w-full px-4 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+                            min={new Date().toISOString().split('T')[0]}
+                            className="glass-input w-full px-5 py-4 rounded-2xl text-white transition-all font-medium cursor-pointer hover:bg-white/5 active:bg-white/10"
                             value={date}
                             onChange={(e) => setDate(e.target.value)}
                         />
@@ -150,47 +159,47 @@ export default function BookingModal({ room, onClose, booking = null }) {
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-1.5 flex items-center gap-2">
-                                <Clock size={16} className="text-indigo-500" />
+                            <label className="block text-[10px] font-black text-white mb-2 ml-1 uppercase tracking-[0.2em] flex items-center gap-2">
+                                <Clock size={14} className="text-white" />
                                 Початок
                             </label>
                             <input
                                 required
                                 type="time"
-                                className="w-full px-4 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+                                className="glass-input w-full px-5 py-4 rounded-2xl text-white transition-all font-medium cursor-pointer hover:bg-white/5 active:bg-white/10"
                                 value={startTime}
                                 onChange={(e) => setStartTime(e.target.value)}
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-1.5 flex items-center gap-2">
-                                <Clock size={16} className="text-indigo-500" />
+                            <label className="block text-[10px] font-black text-white mb-2 ml-1 uppercase tracking-[0.2em] flex items-center gap-2">
+                                <Clock size={14} className="text-white" />
                                 Кінець
                             </label>
                             <input
                                 required
                                 type="time"
-                                className="w-full px-4 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+                                className="glass-input w-full px-5 py-4 rounded-2xl text-white transition-all font-medium cursor-pointer hover:bg-white/5 active:bg-white/10"
                                 value={endTime}
                                 onChange={(e) => setEndTime(e.target.value)}
                             />
                         </div>
                     </div>
 
-                    <div className="pt-2 flex gap-3">
+                    <div className="pt-4 flex gap-4">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 py-3 px-4 border border-slate-200 rounded-2xl font-bold text-slate-700 hover:bg-slate-50 transition-colors"
+                            className="flex-1 py-4 px-4 glass-input rounded-2xl text-slate-300 font-bold hover:bg-white/5 transition-all text-xs uppercase tracking-widest border-none"
                         >
                             Скасувати
                         </button>
                         <button
                             disabled={loading}
                             type="submit"
-                            className="flex-1 py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold transition-all shadow-lg shadow-indigo-100 disabled:opacity-50"
+                            className="premium-button flex-1 py-4 px-4 rounded-2xl font-black text-white transition-all text-xs uppercase tracking-widest"
                         >
-                            {loading ? 'Обробка...' : (booking ? 'Зберегти' : 'Підтвердити')}
+                            {loading ? 'Processing...' : (booking ? 'Зберегти' : 'Забронювати')}
                         </button>
                     </div>
                 </form>
