@@ -20,10 +20,11 @@ export function AuthProvider({ children }) {
 
     function signup(email, password, name) {
         return createUserWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-                return updateProfile(userCredential.user, {
+            .then(async (userCredential) => {
+                await updateProfile(userCredential.user, {
                     displayName: name
                 });
+                setUser({ ...auth.currentUser });
             });
     }
 
