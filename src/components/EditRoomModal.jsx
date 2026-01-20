@@ -1,14 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { X, UserPlus, Shield, User, Trash2 } from 'lucide-react';
 import { db } from '../firebase/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
+import { useAuth } from '../context/AuthContext';
 
 export default function EditRoomModal({ room, onClose }) {
+    const { user } = useAuth();
     const [name, setName] = useState(room.name);
     const [description, setDescription] = useState(room.description);
     const [newMemberEmail, setNewMemberEmail] = useState('');
     const [members, setMembers] = useState(room.members || {});
     const [loading, setLoading] = useState(false);
+
+    const normalizedUserEmail = user?.email?.toLowerCase();
+    const rawRole = members[user?.email] || members[normalizedUserEmail];
+    const isOwner = room.createdBy?.toLowerCase() === normalizedUserEmail;
+    const currentUserRole = (rawRole === 'Admin' || rawRole === 'Creator' || isOwner) ? 'Admin' : 'User';
 
     async function handleSubmit(e) {
         e.preventDefault();
@@ -28,20 +35,21 @@ export default function EditRoomModal({ room, onClose }) {
 
     function addMember() {
         if (!newMemberEmail) return;
-        setMembers({ ...members, [newMemberEmail]: 'User' });
+        const normalizedEmail = newMemberEmail.trim().toLowerCase();
+        setMembers({ ...members, [normalizedEmail]: 'User' });
         setNewMemberEmail('');
+    }
+
+    function toggleRole(email) {
+        const targetRole = members[email];
+        const nextRole = targetRole === 'Admin' ? 'User' : 'Admin';
+        setMembers({ ...members, [email]: nextRole });
     }
 
     function removeMember(email) {
         const updated = { ...members };
         delete updated[email];
         setMembers(updated);
-    }
-
-    function toggleRole(email) {
-        const currentRole = members[email];
-        const nextRole = currentRole === 'Admin' ? 'User' : 'Admin';
-        setMembers({ ...members, [email]: nextRole });
     }
 
     return (
@@ -102,35 +110,48 @@ export default function EditRoomModal({ room, onClose }) {
                         </div>
 
                         <div className="space-y-2">
-                            {Object.entries(members).map(([email, role]) => (
-                                <div key={email} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl group">
-                                    <div className="flex items-center gap-3">
-                                        <div className="bg-white p-1.5 rounded-lg border border-slate-100">
-                                            {role === 'Admin' ? <Shield size={14} className="text-indigo-600" /> : <User size={14} className="text-slate-400" />}
+                            {Object.entries(members)
+                                .sort(([email1, role1], [email2, role2]) => {
+                                    const e1 = email1.toLowerCase();
+                                    const e2 = email2.toLowerCase();
+
+                                    if (e1 === normalizedUserEmail) return -1;
+                                    if (e2 === normalizedUserEmail) return 1;
+
+                                    const roleOrder = { Admin: 1, User: 2 };
+                                    return (roleOrder[role1] || 3) - (roleOrder[role2] || 3);
+                                })
+                                .map(([email, role]) => (
+                                    <div key={email} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl group">
+                                        <div className="flex items-center gap-3">
+                                            <div className="bg-white p-1.5 rounded-lg border border-slate-100">
+                                                {role === 'Admin' ? <Shield size={14} className="text-indigo-600" /> : <User size={14} className="text-slate-400" />}
+                                            </div>
+                                            <div>
+                                                <p className="text-xs font-semibold text-slate-900">{email}</p>
+                                                <p className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">{role}</p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p className="text-xs font-semibold text-slate-900">{email}</p>
-                                            <p className="text-[10px] text-slate-500 uppercase tracking-wider">{role}</p>
-                                        </div>
+                                        {(currentUserRole === 'Admin' && email.toLowerCase() !== normalizedUserEmail) && (
+                                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => toggleRole(email)}
+                                                    className="text-[10px] font-bold text-indigo-600 hover:bg-white px-2 py-1 rounded-md"
+                                                >
+                                                    Змінити роль
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeMember(email)}
+                                                    className="p-1.5 text-slate-400 hover:text-red-600 transition-colors"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
-                                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button
-                                            type="button"
-                                            onClick={() => toggleRole(email)}
-                                            className="text-[10px] font-bold text-indigo-600 hover:bg-white px-2 py-1 rounded-md"
-                                        >
-                                            Змінити роль
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => removeMember(email)}
-                                            className="p-1.5 text-slate-400 hover:text-red-600 transition-colors"
-                                        >
-                                            <Trash2 size={14} />
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
+                                ))}
                         </div>
                     </div>
 

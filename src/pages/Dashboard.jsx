@@ -12,6 +12,20 @@ export default function Dashboard() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingRoom, setEditingRoom] = useState(null);
 
+    const canEditRoom = (room) => {
+        if (!user?.email) return false;
+        const normalizedUserEmail = user.email.toLowerCase();
+
+        if (room.createdBy?.toLowerCase() === normalizedUserEmail) return true;
+
+        const members = room.members || {};
+        const userRole = Object.entries(members).find(
+            ([email]) => email.toLowerCase() === normalizedUserEmail
+        )?.[1];
+
+        return userRole === 'Admin';
+    };
+
     useEffect(() => {
         const q = query(collection(db, 'rooms'));
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -85,24 +99,30 @@ export default function Dashboard() {
                                     <div className="bg-indigo-50 text-indigo-700 p-3 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                                         <Users size={24} />
                                     </div>
-                                    {user.email === room.createdBy && (
-                                        <div className="flex gap-2">
+                                    <div className="flex gap-2">
+                                        {canEditRoom(room) && (
                                             <button
                                                 onClick={() => setEditingRoom(room)}
                                                 className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                                                title="Редагувати"
                                             >
                                                 <Edit size={18} />
                                             </button>
+                                        )}
+
+                                        {canEditRoom(room) && (
                                             <button
-                                                onClick={async () => {
-                                                    if (confirm('Ви впевнені?')) await deleteDoc(doc(db, 'rooms', room.id))
+                                                onClick={async (e) => {
+                                                    e.stopPropagation();
+                                                    if (confirm('Ви впевнені, що хочете видалити всю кімнату?')) await deleteDoc(doc(db, 'rooms', room.id))
                                                 }}
                                                 className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                title="Видалити кімнату"
                                             >
                                                 <Trash2 size={18} />
                                             </button>
-                                        </div>
-                                    )}
+                                        )}
+                                    </div>
                                 </div>
                                 <h3 className="text-lg font-bold text-slate-900 mb-1">{room.name}</h3>
                                 <p className="text-slate-500 text-sm mb-4 line-clamp-2">{room.description}</p>

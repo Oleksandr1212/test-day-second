@@ -15,13 +15,14 @@ export default function CreateRoomModal({ onClose }) {
         setLoading(true);
 
         try {
+            const normalizedEmail = user.email.toLowerCase();
             await addDoc(collection(db, 'rooms'), {
                 name,
                 description,
-                createdBy: user.email,
+                createdBy: normalizedEmail,
                 createdAt: new Date(),
                 members: {
-                    [user.email]: 'Admin'
+                    [normalizedEmail]: 'Admin'
                 }
             });
             onClose();
