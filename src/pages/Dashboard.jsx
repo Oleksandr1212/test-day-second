@@ -4,11 +4,13 @@ import { useAuth } from '../context/AuthContext';
 import { db } from '../firebase/firebase';
 import { collection, addDoc, query, onSnapshot, doc, deleteDoc } from 'firebase/firestore';
 import CreateRoomModal from '../components/CreateRoomModal';
+import EditRoomModal from '../components/EditRoomModal';
 
 export default function Dashboard() {
     const { user, logout } = useAuth();
     const [rooms, setRooms] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingRoom, setEditingRoom] = useState(null);
 
     useEffect(() => {
         const q = query(collection(db, 'rooms'));
@@ -85,7 +87,10 @@ export default function Dashboard() {
                                     </div>
                                     {user.email === room.createdBy && (
                                         <div className="flex gap-2">
-                                            <button className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
+                                            <button
+                                                onClick={() => setEditingRoom(room)}
+                                                className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                                            >
                                                 <Edit size={18} />
                                             </button>
                                             <button
@@ -115,6 +120,9 @@ export default function Dashboard() {
 
             {isModalOpen && (
                 <CreateRoomModal onClose={() => setIsModalOpen(false)} />
+            )}
+            {editingRoom && (
+                <EditRoomModal room={editingRoom} onClose={() => setEditingRoom(null)} />
             )}
         </div>
     );
