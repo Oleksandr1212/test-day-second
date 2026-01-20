@@ -31,15 +31,23 @@ export default function Dashboard() {
     useEffect(() => {
         const q = query(collection(db, 'rooms'));
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
+            const normalizedUserEmail = user?.email?.toLowerCase();
             const roomsData = [];
             querySnapshot.forEach((doc) => {
-                roomsData.push({ id: doc.id, ...doc.data() });
+                const data = doc.data();
+                const members = data.members || {};
+                const isMember = members[user?.email] || members[normalizedUserEmail];
+                const isCreator = data.createdBy?.toLowerCase() === normalizedUserEmail;
+
+                if (isMember || isCreator) {
+                    roomsData.push({ id: doc.id, ...data });
+                }
             });
             setRooms(roomsData);
         });
 
         return () => unsubscribe();
-    }, []);
+    }, [user]);
 
     return (
         <div className="min-h-screen bg-slate-50">
