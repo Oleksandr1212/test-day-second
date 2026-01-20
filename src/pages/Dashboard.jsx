@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { LogOut, Layout, Plus, Users, Trash2, Edit } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../firebase/firebase';
@@ -8,6 +9,7 @@ import EditRoomModal from '../components/EditRoomModal';
 
 export default function Dashboard() {
     const { user, logout } = useAuth();
+    const navigate = useNavigate();
     const [rooms, setRooms] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingRoom, setEditingRoom] = useState(null);
@@ -129,9 +131,22 @@ export default function Dashboard() {
                                 <div className="pt-4 border-t border-slate-50 flex justify-between items-center text-xs text-slate-400">
                                     <span>Створено: {room.createdBy}</span>
                                 </div>
-                                <button className="w-full mt-4 py-2 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
-                                    Відкрити бронювання
-                                </button>
+                                {canEditRoom(room) && (
+                                    <button
+                                        onClick={() => navigate(`/room/${room.id}`)}
+                                        className="w-full mt-4 py-2 bg-indigo-50 hover:bg-indigo-600 hover:text-white rounded-xl text-sm font-bold text-indigo-700 transition-all border border-indigo-100"
+                                    >
+                                        Відкрити бронювання
+                                    </button>
+                                )}
+                                {!canEditRoom(room) && (
+                                    <button
+                                        onClick={() => navigate(`/room/${room.id}`)}
+                                        className="w-full mt-4 py-2 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+                                    >
+                                        Відкрити бронювання
+                                    </button>
+                                )}
                             </div>
                         ))}
                     </div>
