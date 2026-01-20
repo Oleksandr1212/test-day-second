@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { doc, onSnapshot, collection, query, where, orderBy, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase/firebase';
 import { useAuth } from '../context/AuthContext';
-import { ArrowLeft, Calendar, Clock, Users, Plus, Shield, Trash2 } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, Users, Plus, Shield, Trash2, Edit } from 'lucide-react';
 import BookingModal from '../components/BookingModal';
 
 export default function RoomDetails() {
@@ -14,6 +14,7 @@ export default function RoomDetails() {
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+    const [editBooking, setEditBooking] = useState(null);
 
     useEffect(() => {
         if (!roomId) return;
@@ -167,13 +168,25 @@ export default function RoomDetails() {
                                         </div>
 
                                         {(isAdmin || booking.createdBy === normalizedUserEmail) && (
-                                            <button
-                                                onClick={() => deleteBooking(booking.id)}
-                                                className="p-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
-                                                title="Скасувати бронювання"
-                                            >
-                                                <Trash2 size={18} />
-                                            </button>
+                                            <div className="flex gap-2">
+                                                <button
+                                                    onClick={() => {
+                                                        setEditBooking(booking);
+                                                        setIsBookingModalOpen(true);
+                                                    }}
+                                                    className="p-2.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
+                                                    title="Редагувати бронювання"
+                                                >
+                                                    <Edit size={18} />
+                                                </button>
+                                                <button
+                                                    onClick={() => deleteBooking(booking.id)}
+                                                    className="p-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
+                                                    title="Скасувати бронювання"
+                                                >
+                                                    <Trash2 size={18} />
+                                                </button>
+                                            </div>
                                         )}
                                     </div>
                                 </div>
@@ -186,7 +199,11 @@ export default function RoomDetails() {
             {isBookingModalOpen && (
                 <BookingModal
                     room={room}
-                    onClose={() => setIsBookingModalOpen(false)}
+                    booking={editBooking}
+                    onClose={() => {
+                        setIsBookingModalOpen(false);
+                        setEditBooking(null);
+                    }}
                 />
             )}
         </div>
